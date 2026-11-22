@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniConnect — Profile</title>
+  <style>
+    :root {
+      --navy: #071329;
+      --navy-mid: #102754;
+      --royal: #2563eb;
+      --royal-dark: #1d4ed8;
+      --sky: #f2f6ff;
+      --white: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background: linear-gradient(150deg, #edf3ff 0%, #e1ecff 55%, #f6f9ff 100%);
+      min-height: 100vh;
+    }
+    .topbar {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 65%, var(--royal) 100%);
+      color: var(--white);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .brand { font-weight: 900; font-size: 1.2rem; text-decoration: none; color: #fff; }
+    .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+    .nav-btn {
+      text-decoration: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+    .nav-btn.active, .nav-btn:hover { background: var(--royal); box-shadow: 0 3px 0 #172554; }
+    .container { max-width: 1000px; margin: 22px auto; padding: 0 20px; display: grid; gap: 18px; }
+    .card-3d {
+      background: var(--white);
+      border-radius: 18px;
+      border: 1px solid #cfe0ff;
+      padding: 22px;
+      box-shadow: 0 14px 28px -12px rgba(7, 19, 41, 0.16);
+    }
+    .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .info-box { background: var(--sky); border: 1px solid #cfe0ff; border-radius: 12px; padding: 12px 14px; }
+    .info-box small { display: block; color: var(--muted); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; }
+    .info-box strong { font-size: 0.98rem; color: var(--navy); }
+    .pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: #dbeafe;
+      color: var(--royal-dark);
+    }
+    .mail-box { background: var(--sky); border: 1px solid #cfe0ff; border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    @media (max-width: 720px) { .info-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('dashboard') }}">UC • UniConnect</a>
+    <nav class="nav-links">
+      <a class="nav-btn" href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a class="nav-btn" href="{{ url_for('calendar_view') }}">Calendar</a>
+      <a class="nav-btn active" href="{{ url_for('profile_view') }}">Profile</a>
+      <a class="nav-btn" href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="card-3d">
+      <span class="pill">{{ role_label }}</span>
+      <h1 style="margin:8px 0 4px;color:var(--navy);">{{ user.name }}</h1>
+      <p style="margin:0;color:var(--muted);font-size:0.88rem;">
+        Active Session Account • {{ registered_users_count }} users in memory
+      </p>
+
+      <div class="info-grid">
+        <div class="info-box"><small>Registration Number</small><strong>{{ user.reg_no }}</strong></div>
+        <div class="info-box"><small>Department</small><strong>{{ user.department }}</strong></div>
+        <div class="info-box"><small>University Email</small><strong>{{ user.email }}</strong></div>
+        <div class="info-box"><small>Role</small><strong>{{ role_label }}</strong></div>
+      </div>
+    </section>
+
+    <section class="card-3d">
+      <h2 style="margin:0 0 12px;color:var(--navy);">My Email Notifications</h2>
+      {% for em in emails %}
+        <div class="mail-box">
+          <div><strong>{{ em.subject }}</strong> <span class="pill">{{ em.sent_at }}</span></div>
+          <div style="font-size:0.84rem;color:#334155;margin-top:4px;">{{ em.body }}</div>
+        </div>
+      {% else %}
+        <p style="color:var(--muted);">No emails recorded for this account yet.</p>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>
