@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UniConnect — Sign In &amp; Sign Up</title>
+  <style>
+    :root {
+      --navy: #071329;
+      --navy-mid: #102754;
+      --royal: #2563eb;
+      --royal-dark: #1d4ed8;
+      --sky: #f2f6ff;
+      --white: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(37, 99, 235, 0.14), transparent 40%),
+        linear-gradient(155deg, #edf3ff 0%, #e1ecff 55%, #f6f9ff 100%);
+    }
+    .center-wrap {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    .panel-3d {
+      background: var(--white);
+      border: 1px solid #cfe0ff;
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow:
+        0 22px 40px -14px rgba(7, 19, 41, 0.2),
+        0 6px 14px rgba(37, 99, 235, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    .brand-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      margin-bottom: 18px;
+    }
+    .logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #60a5fa, var(--royal));
+      color: var(--white);
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #172554;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .tab-btn {
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid #cbd5e1;
+      background: var(--sky);
+      font-weight: 800;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--royal), var(--navy-mid));
+      color: var(--white);
+      border-color: var(--royal-dark);
+      box-shadow: 0 4px 0 #172554;
+    }
+    .form-grid { display: grid; gap: 12px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1.5px solid #cbd5e1;
+      background: #f8fbff;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--royal);
+      background: var(--white);
+    }
+    .btn-main {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--royal), var(--navy-mid));
+      color: var(--white);
+      font-weight: 800;
+      font-size: 0.94rem;
+      cursor: pointer;
+      box-shadow: 0 5px 0 #172554;
+      margin-top: 4px;
+    }
+    .flash {
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      color: var(--navy);
+      padding: 10px 12px;
+      border-radius: 11px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .hint-line {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .hidden { display: none; }
+    @media (max-width: 560px) {
+      .panel-3d { padding: 22px; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="center-wrap">
+    <section class="panel-3d">
+      <div class="brand-top">
+        <div class="logo-badge">UC</div>
+        <div>
+          <div style="font-weight:900;font-size:1.2rem;color:var(--navy);">UniConnect</div>
+          <div style="font-size:0.76rem;color:var(--muted);">University Events &amp; Society Portal</div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button type="button" id="tabLogin" class="tab-btn {% if active_tab != 'signup' %}active{% endif %}" onclick="switchTab('login')">Sign In</button>
+        <button type="button" id="tabSignup" class="tab-btn {% if active_tab == 'signup' %}active{% endif %}" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      {% for msg in get_flashed_messages() %}
+        <div class="flash">{{ msg }}</div>
+      {% endfor %}
+
+      <!-- SIGN IN FORM -->
+      <form id="loginForm" method="POST" action="{{ url_for('login') }}" class="form-grid {% if active_tab == 'signup' %}hidden{% endif %}">
+        <div>
+          <label for="loginRole">Role</label>
+          <select id="loginRole" name="role" onchange="syncDemoEmail()">
+            <option value="student" {% if selected_role == 'student' %}selected{% endif %}>Student</option>
+            <option value="society" {% if selected_role == 'society' %}selected{% endif %}>Society Member</option>
+            <option value="admin" {% if selected_role == 'admin' %}selected{% endif %}>Admin</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="loginEmail">University Email</label>
+          <input id="loginEmail" name="email" type="email" value="{{ entered_email or 'st.ali@uni.pk' }}" required />
+        </div>
+
+        <div>
+          <label for="loginPass">Password</label>
+          <input id="loginPass" name="password" type="password" value="123" required />
+        </div>
+
+        <button type="submit" class="btn-main">Sign In →</button>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="signupForm" method="POST" action="{{ url_for('signup') }}" class="form-grid {% if active_tab != 'signup' %}hidden{% endif %}">
+        <div class="two-col">
+          <div>
+            <label for="regNo">Registration Number</label>
+            <input id="regNo" name="reg_no" placeholder="e.g., STU-2026-305" required />
+          </div>
+          <div>
+            <label for="signupRole">Role</label>
+            <select id="signupRole" name="role">
+              <option value="student">Student</option>
+              <option value="society">Society Member</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div>
+            <label for="signupName">Full Name</label>
+            <input id="signupName" name="name" placeholder="e.g., Sara Tariq" required />
+          </div>
+          <div>
+            <label for="signupDept">Department</label>
+            <select id="signupDept" name="department">
+              {% for dept in departments %}
+                <option value="{{ dept }}">{{ dept }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="signupEmail">University Email</label>
+          <input id="signupEmail" name="email" type="email" placeholder="st.name@uni.pk" required />
+        </div>
+
+        <div class="two-col">
+          <div>
+            <label for="signupPass">Password</label>
+            <input id="signupPass" name="password" type="password" placeholder="Create password" required />
+          </div>
+          <div>
+            <label for="societyName">Society Name (Optional)</label>
+            <input id="societyName" name="society_name" placeholder="e.g., Tech & AI Society" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn-main">Create Account →</button>
+      </form>
+
+      <div class="hint-line">
+        Mock Accounts (Password: <strong>123</strong>): <strong>st.ali@uni.pk</strong> (Student), <strong>s_mem.bilal@uni.pk</strong> (Society), <strong>ad.zainab@uni.pk</strong> (Admin)
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function switchTab(mode) {
+      const isSignup = mode === "signup";
+      document.getElementById("loginForm").classList.toggle("hidden", isSignup);
+      document.getElementById("signupForm").classList.toggle("hidden", !isSignup);
+      document.getElementById("tabLogin").classList.toggle("active", !isSignup);
+      document.getElementById("tabSignup").classList.toggle("active", isSignup);
+    }
+    function syncDemoEmail() {
+      const role = document.getElementById("loginRole").value;
+      const emailInput = document.getElementById("loginEmail");
+      const defaults = {
+        student: "st.ali@uni.pk",
+        society: "s_mem.bilal@uni.pk",
+        admin: "ad.zainab@uni.pk"
+      };
+      emailInput.value = defaults[role] || "st.ali@uni.pk";
+    }
+  </script>
+</body>
+</html>
